@@ -7,48 +7,37 @@ ryby_tibble <- as_tibble(ryby)
 library(GGally)
 
 ryby_tibble %>%
-  select(log_weight, length, power, surf_temp, nao_index) %>%
+  select(log_total_weight, n_malych, n_duzych, mean_engine_age_maly, mean_engine_age_duzy, surf_temp, nao_index) %>%
   ggpairs()
 
 ryby_tibble %>%
-  select(log_weight, engine_age, length, power, month_sin, month_cos, y_month, year, nao_index, surf_temp) %>%
+  select(log_total_weight, n_malych, n_duzych, mean_engine_age_maly, mean_length_duzy, mean_length_maly, month_sin, month_cos, y_month, year, nao_index, surf_temp) %>%
   pivot_longer(everything(), names_to = "zmienna", values_to = "wartosc") %>%
   ggplot(aes(x = wartosc)) +
   geom_histogram(bins = 50) +
   facet_wrap(~ zmienna, scales = "free")
 
-ryby_tibble <- ryby_tibble %>%
-  mutate(
-    power = log(power + 1),
-    engine_age = log(engine_age + 1)
-  )
-
 ryby_tibble %>%
-  select(log_weight, length, power, engine_age) %>%
+  select(log_total_weight, n_malych, n_duzych, mean_length_maly, mean_length_duzy) %>%
   ggpairs()
 
 ryby_tibble %>%
-  select(log_weight, month_sin, month_cos, y_month, year) %>%
+  select(log_total_weight, month_sin, month_cos, y_month, year) %>%
   ggpairs()
 
 ryby_tibble %>%
-  select(log_weight, nao_index,surf_temp,y_month,year) %>%
+  select(log_total_weight, nao_index,surf_temp,y_month,year) %>%
   ggpairs()
 
-ryby_tibble %>%
-  select(log_weight, engine_age, length, power, month_sin, month_cos, y_month, year, nao_index, surf_temp) %>%
-  pivot_longer(everything(), names_to = "zmienna", values_to = "wartosc") %>%
-  ggplot(aes(x = wartosc)) +
-  geom_histogram(bins = 50) +
-  facet_wrap(~ zmienna, scales = "free")
+library(corrplot)
 
-# macierz korelacji
-zmienne <- ryby_tibble %>%
-  select(log_weight, engine_age, length, power, month_sin, month_cos, y_month, year, nao_index, surf_temp)
-macierz_cor <- cor(zmienne, use = "complete.obs")
+macierz <- ryby_agg %>%
+  select(total_weight, n_malych, n_duzych,
+         mean_length_maly, mean_length_duzy,
+         mean_engine_age_maly, mean_engine_age_duzy,
+         surf_temp, nao_index, month_sin, month_cos) %>%
+  cor(use = "complete.obs")
 
-# korelogram
-corrplot(macierz_cor, method = "color", type = "upper", 
+corrplot(macierz, method = "color", type = "upper",
          addCoef.col = "black", number.cex = 0.7,
          tl.cex = 0.8)
-
