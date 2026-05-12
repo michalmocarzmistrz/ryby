@@ -12,7 +12,7 @@ nrow(ryby_tibble)
 
 # wyciagam tylko te rekordy gdzie był połów i które były w wybranych patchach
 ryby_tibble <- ryby_tibble %>%
-  filter(str_detect(patch, "^28-"))
+  filter(str_detect(patch, "^28-52"))
 
 ryby_tibble %>%
   filter(y_month == 1) %>%
@@ -129,6 +129,12 @@ ryby_agg %>%
 ryby_agg <- ryby_agg %>%
   filter(total_weight > 0)
 
+ryby_agg %>%
+  summarise(
+    n_zer = sum(total_weight == 0),
+    procent_zer = mean(total_weight == 0) * 100
+  )
+
 library(gridExtra)
 
 ggplot(ryby_agg, aes(x = total_weight)) +
@@ -149,5 +155,4 @@ ggsave("wykresy/boxplot_weigth_log.png")
 ryby_agg <- ryby_agg %>%
   mutate(log_total_weight = log(total_weight + 1)
   )
-
 write.csv(ryby_agg, "data/dataset_cleaned.csv", row.names = FALSE)
