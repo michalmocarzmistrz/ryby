@@ -1,38 +1,51 @@
 library(tidyverse)
 library(corrplot)
+library(performance)
 
-ryby <- read.csv("data/dataset_prepared.csv", stringsAsFactors = TRUE)
-ryby <- as_tibble(ryby)
+train <- read.csv("data/train.csv", stringsAsFactors = TRUE)
+train <- as_tibble(train)
 
-summary(ryby)
+test <- read.csv("data/test.csv", stringsAsFactors = TRUE)
+test <- as_tibble(test)
+
+summary(train)
 
 model <- lm(
-  log_total_weight ~ surf_temp + month_sin,
-  data = ryby
+  log_total_weight ~ n_malych + n_duzych + month_cos,
+  data = train
 )
 
 summary(model)
-
-library(performance)
-
 check_model(model)
 
-# Wykresy reszt
-ggplot(model, aes(x = .fitted, y = .resid)) +
+# predykcja
+test$predicted <- predict(model, newdata = test)
+
+# reszty
+test$residuals <- test$log_total_weight - test$predicted
+
+rmse <- sqrt(mean(test$residuals^2))
+mae  <- mean(abs(test$residuals))
+r2   <- cor(test$log_total_weight, test$predicted)^2
+
+cat("RMSE:", rmse, "\nMAE:", mae, "\nR²:", r2, "\n")
+
+# 4. Wykresy na danych testowych
+ggplot(test, aes(x = predicted, y = residuals)) +
   geom_point() +
   geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
-  labs(x = "Wartości przewidywane", y = "Reszty") +
-  ggtitle("Residuals vs. Fitted")
+  labs(x = "obserwacje", y = "reszty") +
+  ggtitle("scatter plot (test)")
 
-# Histogram reszt
-ggplot(model, aes(x = .resid)) +
+
+ggplot(test, aes(x = residuals)) +
   geom_histogram(bins = 30, fill = "blue", alpha = 0.7) +
-  labs(x = "Reszty", y = "Częstość") +
-  ggtitle("Histogram reszt")
+  labs(x = "reszty", y = "czestosc") +
+  ggtitle("histogram reszt (test)")
 
 # Q-Q plot
-ggplot(model, aes(sample = .resid)) +
+ggplot(test, aes(sample = residuals)) +
   stat_qq() +
   stat_qq_line() +
-  labs(x = "Teoretyczne kwantyle", y = "Reszty") +
-  ggtitle("Wykres Q-Q reszt")
+  labs(x = "kwantyle", y = "reszty") +
+  ggtitle("Q-Q plot reszt (test)")
