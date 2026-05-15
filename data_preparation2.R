@@ -105,9 +105,9 @@ train %>%
 
 train <- train %>%
   mutate(time_of_day = case_when(
-    hour >= 21 | time < 5  ~ "night",
-    hour >= 5  & time < 16 ~ "afternoon",
-    hour >= 16 & time < 21 ~ "evening"
+    time >= 21 | time < 5  ~ "night",
+    time >= 5  & time < 16 ~ "afternoon",
+    time >= 16 & time < 21 ~ "evening"
   ) %>% factor())
 
 peak_hour <- 20 
@@ -144,8 +144,6 @@ cor_matrix <- cor(vars, method = "spearman", use = "complete.obs")
 corrplot(cor_matrix, method = "number", type = "upper")
 
 train$deliveries_f <- as.factor(train$deliveries_count)
-val$deliveries_f <- as.factor(val$deliveries_count)
-test$deliveries_f <- as.factor(test$deliveries_count)
 
 ####
 
@@ -171,16 +169,16 @@ test <- test %>% mutate(is_summer = if_else(month >= 5 & month <= 9, 1, 0))
 
 val <- val %>%
   mutate(time_of_day = case_when(
-    hour >= 21 | time < 5  ~ "night",
-    hour >= 5  & time < 16 ~ "afternoon",
-    hour >= 16 & time < 21 ~ "evening"
+    time >= 21 | time < 5  ~ "night",
+    time >= 5  & time < 16 ~ "afternoon",
+    time >= 16 & time < 21 ~ "evening"
   ) %>% factor())
 
 test <- test %>%
   mutate(time_of_day = case_when(
-    hour >= 21 | time < 5  ~ "night",
-    hour >= 5  & time < 16 ~ "afternoon",
-    hour >= 16 & time < 21 ~ "evening"
+    time >= 21 | time < 5  ~ "night",
+    time >= 5  & time < 16 ~ "afternoon",
+    time >= 16 & time < 21 ~ "evening"
   ) %>% factor())
 
 val <- val %>%
@@ -206,6 +204,6 @@ test$deliveries_f <- as.factor(test$deliveries_count)
 
 summary(train)
 
-write.csv(ryby, "data/train.csv", row.names = FALSE)
-write.csv(ryby, "data/val.csv", row.names = FALSE)
-write.csv(ryby, "data/test.csv", row.names = FALSE)
+write.csv(train, "data/train.csv", row.names = FALSE)
+write.csv(val, "data/val.csv", row.names = FALSE)
+write.csv(test, "data/test.csv", row.names = FALSE)
