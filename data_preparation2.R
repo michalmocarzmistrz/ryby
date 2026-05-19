@@ -88,7 +88,7 @@ ggplot(train, aes(x = factor(weekday), y = log_tip)) +
   geom_boxplot(fill = "yellow", alpha = 0.6)
 
 train <- train %>%
-  mutate(is_weekday = if_else(month >= 3, 1, 0))
+  mutate(is_weekday = if_else(weekday >= 3, 1, 0))
 
 ggplot(train, aes(x = factor(month), y = log_tip)) +
   geom_boxplot(fill = "navy", alpha = 0.6)
@@ -162,8 +162,8 @@ test <- test %>%
     dist_dur = log_distance * duration_min
   )
 #2
-val <- val %>% mutate(is_weekday = if_else(month >= 3, 1, 0))
-test <- test %>% mutate(is_weekday = if_else(month >= 3, 1, 0))
+val <- val %>% mutate(is_weekday = if_else(weekday >= 3, 1, 0))
+test <- test %>% mutate(is_weekday = if_else(weekday >= 3, 1, 0))
 val  <- val  %>% mutate(is_summer = if_else(month >= 5 & month <= 9, 1, 0))
 test <- test %>% mutate(is_summer = if_else(month >= 5 & month <= 9, 1, 0))
 
